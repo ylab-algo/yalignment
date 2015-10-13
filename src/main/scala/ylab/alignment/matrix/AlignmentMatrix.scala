@@ -60,6 +60,12 @@ class AlignmentMatrix[@specialized(Char, Byte) T](maxWidth : Int, maxHeight : In
   }
 
   @inline
+  def sequenceCopy : Side => IndexedSeq[T] = {
+    case Horizontal => _horizontal.sequenceCopy
+    case Vertical => _vertical.sequenceCopy
+  }
+
+  @inline
   def horizontal : Array[T] = _horizontal.sequence
 
   @inline

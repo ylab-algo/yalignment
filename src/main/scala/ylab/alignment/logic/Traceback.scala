@@ -1,7 +1,7 @@
 package ylab.alignment.logic
 
+import ylab.alignment.TracebackResult
 import ylab.alignment.matrix.AlignmentMatrix
-import ylab.alignment.{Horizontal, TracebackResult, Vertical}
 
 /**
  * User: pavel

@@ -40,11 +40,10 @@ class Matrix(val maxWidth : Int, val maxHeight : Int) {
 
   @inline
   final def update(row : MatrixCoordinateAny, col : Int, value : Int => Int) : Unit = {
-    val end = decodeCoordiates(_height - 1, col)
-    ((col to end by maxWidth) zip (0 until _height)).foreach {
+    val end = decodeCoordiates(_height, col)
+    (col until end by maxWidth).zipWithIndex.foreach {
       case (idx, i) =>
-        val v = value(i)
-        update(idx, v)
+        update(idx, value(i))
     }
   }
 
@@ -53,8 +52,7 @@ class Matrix(val maxWidth : Int, val maxHeight : Int) {
     val start = rowStart(row)
     (start until start + _width).foreach {
       case idx =>
-        val v = value(idx - start)
-        update(idx, v)
+        update(idx, value(idx - start))
     }
   }
 
@@ -73,13 +71,16 @@ class Matrix(val maxWidth : Int, val maxHeight : Int) {
   @inline
   final def rowMax(row : Int) : (Int, Int) = {
     val start = rowStart(row)
-    (start until start + _width).map { case idx => (apply(idx), idx - start) }.maxBy(_._1)
+    (start until start + _width).map {
+      case idx =>
+        (apply(idx), idx - start)
+    }.maxBy(_._1)
   }
 
   @inline
   final def colMax(col : Int) : (Int, Int) = {
-    val end = decodeCoordiates(_height - 1, col)
-    ((col to end by maxWidth) zip (0 until _height)).map {
+    val end = decodeCoordiates(_height, col)
+    (col until end by maxWidth).zipWithIndex.map {
       case (idx, row) =>
         (apply(idx), row)
     }.maxBy(_._1)

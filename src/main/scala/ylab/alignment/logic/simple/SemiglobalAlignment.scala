@@ -1,6 +1,6 @@
 package ylab.alignment.logic.simple
 
-import ylab.alignment.TracebackResult
+import ylab.alignment.{Vertical, Horizontal, TracebackResult}
 import ylab.alignment.logic.{MatrixType, PrimaryMatrix}
 
 /**
@@ -28,26 +28,29 @@ class SemiglobalAlignment[@specialized(Char, Byte) T](maxWidth : Int, maxHeight 
 
     val tr = TracebackResult[T](score = math.max(rs, cs))
 
-    _primaryMatrix.horizontal
-
     if (rs >= cs) {
       tr.row = height - 1
       tr.col = col
 
-      (width - 1 until col by -1).reverseIterator.foreach {
-        case i =>
-          tr.horizontal = Some(null.asInstanceOf[T]) :: tr.horizontal
-          tr.vertical = None :: tr.vertical
+      val seq = _primaryMatrix.sequenceCopy(Horizontal)
+      var i = width - 1
+      while (i > col) {
+        tr.horizontal = Some(seq(i - 1)) :: tr.horizontal
+        tr.vertical = None :: tr.vertical
+        i -= 1
       }
     }
     else {
       tr.row = row
       tr.col = width - 1
 
-      (height - 1 until row by -1).reverseIterator.foreach {
-        case i =>
-          tr.horizontal = None :: tr.horizontal
-          tr.vertical = Some(null.asInstanceOf[T]) :: tr.vertical
+      val seq = _primaryMatrix.sequenceCopy(Vertical)
+
+      var i = height - 1
+      while (i > row) {
+        tr.horizontal = None :: tr.horizontal
+        tr.vertical = Some(seq(i - 1)) :: tr.vertical
+        i -= 1
       }
     }
 

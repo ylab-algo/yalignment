@@ -1,12 +1,14 @@
 package ylab.alignment.matrix
 
+import scala.collection.mutable
+
 /**
  * User: pavel
  * Date: 11.10.15
  * Time: 0:09
  */
 class MatrixSideSequence[@specialized(Char, Byte) T](val maxSize : Int) {
-  private [this] val _sequence = Array.fill[T](maxSize)(null.asInstanceOf[T])
+  private [this] val _sequence = new Array[Any](maxSize).asInstanceOf[Array[T]]
   private [this] var _realSize = 0
 
   @inline
@@ -30,4 +32,15 @@ class MatrixSideSequence[@specialized(Char, Byte) T](val maxSize : Int) {
 
   @inline
   def sequence : Array[T] = _sequence
+
+  @inline
+  def sequenceCopy : IndexedSeq[T] = {
+    val tmp = mutable.ArrayBuffer.empty[T]
+    var i = 0
+    while (i < _realSize) {
+      tmp += _sequence(i)
+      i += 1
+    }
+    tmp
+  }
 }

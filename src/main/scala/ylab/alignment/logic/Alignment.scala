@@ -21,16 +21,16 @@ abstract class Alignment[@specialized(Char, Byte) T](maxWidth : Int,
 
   @inline
   def push(s : Iterable[T])(side : Side) : Unit = {
-    val (oWidth, oHeight) = (width, height)
+    val (oWidth, oHeight) = (width - 1, height - 1)
 
     _primaryMatrix.push(s)(side)
     matricies.values.foreach(_.move(s.size)(side))
 
     side match {
       case Horizontal =>
-        (oWidth to width).foreach(updateHorizontal)
+        (oWidth until width).foreach(updateHorizontal)
       case Vertical =>
-        (oHeight to height).foreach(updateVertical)
+        (oHeight until height).foreach(updateVertical)
     }
   }
 
@@ -40,8 +40,8 @@ abstract class Alignment[@specialized(Char, Byte) T](maxWidth : Int,
     matricies.values.foreach(_.move(1)(side))
 
     side match {
-      case Horizontal => updateHorizontal(width)
-      case Vertical => updateVertical(height)
+      case Horizontal => updateHorizontal(width - 1)
+      case Vertical => updateVertical(height - 1)
     }
   }
 
@@ -53,18 +53,18 @@ abstract class Alignment[@specialized(Char, Byte) T](maxWidth : Int,
 
   @inline
   protected def score(i : Int, j : Int) : Int =
-    substitution(_primaryMatrix.sequence(Vertical)(i), _primaryMatrix.sequence(Horizontal)(j))
+    substitution(_primaryMatrix.vertical(i), _primaryMatrix.horizontal(j))
 
   @inline
   private def updateHorizontal(w : Int) : Unit = {
-    matricies.foreach { case (t, m) => m(:*:, w - 1) = (row : Int) => value(row, w - 1)(t) }
-    _primaryMatrix(:*:, w - 1) = (row : Int) => value(row, w - 1)(PrimaryMatrix)
+    matricies.foreach { case (t, m) => m(:*:, w) = (row : Int) => value(row, w)(t) }
+    _primaryMatrix(:*:, w) = (row : Int) => value(row, w)(PrimaryMatrix)
   }
 
   @inline
   private def updateVertical(h : Int) : Unit = {
-    matricies.foreach { case (t, m) => m(h - 1, :*:) = (col : Int) => value(h - 1, col)(t) }
-    _primaryMatrix(h - 1, :*:) = (col : Int) => value(h - 1, col)(PrimaryMatrix)
+    matricies.foreach { case (t, m) => m(h, :*:) = (col : Int) => value(h, col)(t) }
+    _primaryMatrix(h, :*:) = (col : Int) => value(h, col)(PrimaryMatrix)
   }
 
   def dump() : Unit = _primaryMatrix.dump()
